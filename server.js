@@ -59,10 +59,10 @@ app.get('/stream/:id/:resolution', async (req, res) => {
         const totalLength = resHeaders['content-range']?.split('/')[1];
         const start = parseInt(range.split('=')[1].split('-')[0]);
         const end = parseInt(range.split('=')[1].split('-')[1] || totalLength);
-        const contentLength = end - start + 1;
+        const contentLength = end - start;
 
         const headers = {
-            "Content-Range": `${range.replace('=', ' ')}/${totalLength}`,
+            "Content-Range": `bytes ${start}-${end-1}/${totalLength}`,
             "Accept-Ranges": "bytes",
             "Content-Length": contentLength,
             "Content-Type": "video/mp4",
