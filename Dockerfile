@@ -6,4 +6,6 @@ WORKDIR /app
 COPY package.json .
 RUN yarn install
 COPY . .
-CMD [ "node server" ]
+
+EXPOSE 3001
+CMD [ "node server,js" ]
