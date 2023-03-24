@@ -3,6 +3,24 @@ const app = express();
 const port = process.env.PORT || 3001;
 const { getStream } = require("drive-stream");
 const axios = require("axios").default;
+const NodeCache = require("node-cache");
+const myCache = new NodeCache({
+  stdTTL: (process.env.CACHE_TTL_HOURS || 3) * 60 * 60, // 3 hours
+});
+
+const getCookieData = async (id) => {
+  let data;
+  const dataFromCache = myCache.get(id);
+  if (dataFromCache) {
+    data = dataFromCache;
+    console.log(`Get cookie ${id} from cache`);
+  } else {
+    data = await getStream(id);
+    myCache.set(id, data);
+    console.log(`Get cookie ${id} from api`);
+  }
+  return data;
+};
 
 app.get("/", (req, res) => {
   res.send("Hello World");
@@ -11,7 +29,7 @@ app.get("/", (req, res) => {
 app.get("/urls/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const data = await getStream(id);
+    const data = await getCookieData(id);
     if (!data) throw new Error("No data");
     const urls = [];
     const proxyHost = req.headers["x-forwarded-host"];
@@ -36,8 +54,7 @@ app.get("/stream/:id/:resolution", async (req, res) => {
   try {
     const id = req.params.id;
     const resolution = req.params.resolution || "720P";
-
-    const data = await getStream(id);
+    const data = await getCookieData(id);
     const range = req.headers.range || "bytes=0-";
 
     const url = data[resolution];

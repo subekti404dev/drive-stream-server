@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "drive-stream": "github:subekti404dev/drive-stream",
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "node-cache": "^5.1.2"
   }
 }
